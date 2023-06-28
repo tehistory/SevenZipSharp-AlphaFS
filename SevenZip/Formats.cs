@@ -241,7 +241,7 @@
         /// Mach-O file format.
         /// </summary>
         /// <remarks><a href="https://en.wikipedia.org/wiki/Mach-O">Wikipedia information</a></remarks>
-        MachO
+        MachO,
         /// <summary>
         /// Apple File System Format.
         /// </summary>
