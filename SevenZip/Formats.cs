@@ -242,6 +242,11 @@
         /// </summary>
         /// <remarks><a href="https://en.wikipedia.org/wiki/Mach-O">Wikipedia information</a></remarks>
         MachO
+        /// <summary>
+        /// Apple File System Format.
+        /// </summary>
+        /// <remarks><a href="https://en.wikipedia.org/wiki/Apple_File_System">Wikipedia information</a></remarks>
+        Apfs
     }
 
     /// <summary>
@@ -425,7 +430,8 @@
                 {InArchiveFormat.Ntfs,      new Guid("23170f69-40c1-278a-1000-000110D90000")},
                 {InArchiveFormat.Fat,       new Guid("23170f69-40c1-278a-1000-000110DA0000")},
                 {InArchiveFormat.Mbr,       new Guid("23170f69-40c1-278a-1000-000110DB0000")},
-                {InArchiveFormat.MachO,     new Guid("23170f69-40c1-278a-1000-000110DF0000")}
+                {InArchiveFormat.MachO,     new Guid("23170f69-40c1-278a-1000-000110DF0000")},
+                {InArchiveFormat.Apfs,      new Guid("23170f69-40c1-278a-1000-000110C30000")}
             };
 
         #endregion
