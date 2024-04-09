@@ -275,6 +275,11 @@
         /// <remarks><a href="http://en.wikipedia.org/wiki/Bzip2">Wikipedia information</a></remarks>
         BZip2,
         /// <summary>
+        /// Microsoft Windows Imaging disk image format.
+        /// </summary>
+        /// <remarks><a href="http://en.wikipedia.org/wiki/Windows_Imaging_Format">Wikipedia information</a></remarks>
+        Wim,
+        /// <summary>
         /// Open Tar archive format.
         /// </summary>
         /// <remarks><a href="http://en.wikipedia.org/wiki/Tar_(file_format)">Wikipedia information</a></remarks>
@@ -447,9 +452,10 @@
                 {OutArchiveFormat.SevenZip,     new Guid("23170f69-40c1-278a-1000-000110070000")},
                 {OutArchiveFormat.Zip,          new Guid("23170f69-40c1-278a-1000-000110010000")},
                 {OutArchiveFormat.BZip2,        new Guid("23170f69-40c1-278a-1000-000110020000")},
+                {OutArchiveFormat.Wim,          new Guid("23170f69-40c1-278a-1000-000110E60000")},
                 {OutArchiveFormat.GZip,         new Guid("23170f69-40c1-278a-1000-000110ef0000")},
                 {OutArchiveFormat.Tar,          new Guid("23170f69-40c1-278a-1000-000110ee0000")},
-                {OutArchiveFormat.XZ,           new Guid("23170f69-40c1-278a-1000-0001100C0000")},
+                {OutArchiveFormat.XZ,           new Guid("23170f69-40c1-278a-1000-0001100C0000")}
             };
 
         #endregion
@@ -478,6 +484,7 @@
                 {OutArchiveFormat.SevenZip, InArchiveFormat.SevenZip},
                 {OutArchiveFormat.GZip, InArchiveFormat.GZip},
                 {OutArchiveFormat.BZip2, InArchiveFormat.BZip2},
+                {OutArchiveFormat.Wim, InArchiveFormat.Wim},
                 {OutArchiveFormat.Tar, InArchiveFormat.Tar},
                 {OutArchiveFormat.XZ, InArchiveFormat.XZ},
                 {OutArchiveFormat.Zip, InArchiveFormat.Zip}
