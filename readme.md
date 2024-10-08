@@ -1,5 +1,6 @@
-This is a fork from [tomap's fork](https://github.com/tomap/SevenZipSharp) of the [original CodePlex project](https://archive.codeplex.com/?p=sevenzipsharp).
+This is a fork from [Squid-Box's fork](https://github.com/Squid-Box/SevenZipSharp) of the [original CodePlex project](https://archive.codeplex.com/?p=sevenzipsharp).
 
+Below is the ReadMe from that project
 -------------------------------------------------------------
 
 -------------------------------------------------------------
