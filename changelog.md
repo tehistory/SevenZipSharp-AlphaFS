@@ -1,7 +1,8 @@
 # Changelog
 
 ## 2.0.1 (2024-09-10)
-- Changed AlphaFS to be force regardless of framework.
+- Changed AlphaFS to be forced regardless of framework.
+- Forced GetLongPath calls for compressed file names.
 
 ## 2.0.0 (2024-08-10)
 - Forked from:https://github.com/squid-box/SevenZipSharp
