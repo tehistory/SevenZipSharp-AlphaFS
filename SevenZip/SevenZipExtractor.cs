@@ -9,11 +9,7 @@ namespace SevenZip
 
     using SevenZip.Sdk.Compression.Lzma;
 
-#if NETFRAMEWORK
     using AlphaFS = Alphaleonis.Win32.Filesystem;
-#else
-    using AlphaFS = System.IO;
-#endif
 
     using Stream = System.IO.Stream;
     using FileStream = System.IO.FileStream;

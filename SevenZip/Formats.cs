@@ -2,11 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-#if NETFRAMEWORK
     using AlphaFS = Alphaleonis.Win32.Filesystem;
-#else
-    using AlphaFS = System.IO;
-#endif
 
 #if UNMANAGED
     /// <summary>

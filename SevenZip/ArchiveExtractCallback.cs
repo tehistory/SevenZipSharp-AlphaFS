@@ -3,11 +3,7 @@ namespace SevenZip
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-#if NETFRAMEWORK
     using AlphaFS = Alphaleonis.Win32.Filesystem;
-#else
-    using AlphaFS = System.IO;
-#endif
     using Stream = System.IO.Stream;
     using FileNotFoundException = System.IO.FileNotFoundException;
     using IOException = System.IO.IOException;

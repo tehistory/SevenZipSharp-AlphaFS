@@ -8,11 +8,7 @@ namespace SevenZip
 #if NET472 || NETSTANDARD2_0
     using System.Security.Permissions;
 #endif
-#if NETFRAMEWORK
     using AlphaFS = Alphaleonis.Win32.Filesystem;
-#else
-    using AlphaFS = System.IO;
-#endif
 
     using SevenZip.Sdk;
     using SevenZip.Sdk.Compression.Lzma;
