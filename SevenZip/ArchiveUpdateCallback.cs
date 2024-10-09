@@ -2,8 +2,17 @@ namespace SevenZip
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Runtime.InteropServices;
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+    using Stream = System.IO.Stream;
+    using FileStream = System.IO.FileStream;
+    using FileMode = System.IO.FileMode;
+    using FileAttributes = System.IO.FileAttributes;
+    using SeekOrigin = System.IO.SeekOrigin;
 
 #if UNMANAGED
     /// <summary>
@@ -45,7 +54,7 @@ namespace SevenZip
         /// <summary>
         /// Array of files to pack
         /// </summary>
-        private FileInfo[] _files;
+        private AlphaFS.FileInfo[] _files;
 
         private InStreamWrapper _fileStream;
 
@@ -90,7 +99,7 @@ namespace SevenZip
         /// <param name="updateData">The compression parameters.</param>
         /// <param name="directoryStructure">Preserve directory structure.</param>
         public ArchiveUpdateCallback(
-            FileInfo[] files, int rootLength,
+            AlphaFS.FileInfo[] files, int rootLength,
             SevenZipCompressor compressor, UpdateData updateData, bool directoryStructure)
         {
             Init(files, rootLength, compressor, updateData, directoryStructure);
@@ -106,7 +115,7 @@ namespace SevenZip
         /// <param name="updateData">The compression parameters.</param>
         /// <param name="directoryStructure">Preserve directory structure.</param>
         public ArchiveUpdateCallback(
-            FileInfo[] files, int rootLength, string password,
+            AlphaFS.FileInfo[] files, int rootLength, string password,
             SevenZipCompressor compressor, UpdateData updateData, bool directoryStructure)
             : base(password)
         {
@@ -187,7 +196,7 @@ namespace SevenZip
         }
 
         private void Init(
-            FileInfo[] files, int rootLength, SevenZipCompressor compressor,
+            AlphaFS.FileInfo[] files, int rootLength, SevenZipCompressor compressor,
             UpdateData updateData, bool directoryStructure)
         {
             _files = files;
@@ -579,7 +588,7 @@ namespace SevenZip
                                       ? _files[index].Extension.Substring(1)
                                       : _entries == null
                                           ? ""
-                                          : Path.GetExtension(_entries[index]);
+                                          : AlphaFS.Path.GetExtension(_entries[index]);
                                 value.Value = Marshal.StringToBSTR(val);
                             }
                             catch (ArgumentException)
@@ -589,7 +598,7 @@ namespace SevenZip
                         }
                         else
                         {
-                            val = Path.GetExtension(_updateData.ArchiveFileData[(int) index].FileName);
+                            val = AlphaFS.Path.GetExtension(_updateData.ArchiveFileData[(int) index].FileName);
                             value.Value = Marshal.StringToBSTR(val);
                         }
 
@@ -620,10 +629,10 @@ namespace SevenZip
 
                 try
                 {
-                    if (File.Exists(_files[index].FullName))
+                    if (AlphaFS.File.Exists(_files[index].FullName))
                     {
                         _fileStream = new InStreamWrapper(
-                            new FileStream(_files[index].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                            new FileStream(_files[index].FullName, FileMode.Open),
                             true);
                     }
                 }

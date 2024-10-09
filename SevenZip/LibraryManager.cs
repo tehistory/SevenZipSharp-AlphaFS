@@ -7,10 +7,16 @@ namespace SevenZip
 #if NET472 || NETSTANDARD2_0
     using System.Security.Permissions;
 #endif
-    using System.IO;
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Text;
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+    using Stream = System.IO.Stream;
+    using MemoryStream = System.IO.MemoryStream;
 
 #if UNMANAGED
     /// <summary>
@@ -47,7 +53,7 @@ namespace SevenZip
                 return null;
             }
 
-            return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Environment.Is64BitProcess ? "7z64.dll" : "7z.dll");
+            return AlphaFS.Path.Combine(AlphaFS.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Environment.Is64BitProcess ? "7z64.dll" : "7z.dll");
         }
 
         /// <summary>
@@ -120,7 +126,7 @@ namespace SevenZip
                         _libraryFileName = DetermineLibraryFilePath();
                     }
 
-                    if (!File.Exists(_libraryFileName))
+                    if (!AlphaFS.File.Exists(_libraryFileName))
                     {
                         throw new SevenZipLibraryException("DLL file does not exist.");
                     }
@@ -516,12 +522,12 @@ namespace SevenZip
 
         public static void SetLibraryPath(string libraryPath)
         {
-            if (_modulePtr != IntPtr.Zero && !Path.GetFullPath(libraryPath).Equals(Path.GetFullPath(_libraryFileName), StringComparison.OrdinalIgnoreCase))
+            if (_modulePtr != IntPtr.Zero && !AlphaFS.Path.GetFullPath(libraryPath).Equals(AlphaFS.Path.GetFullPath(_libraryFileName), StringComparison.OrdinalIgnoreCase))
             {
                 throw new SevenZipLibraryException($"can not change the library path while the library \"{_libraryFileName}\" is being used.");
             }
             
-            if (!File.Exists(libraryPath))
+            if (!AlphaFS.File.Exists(libraryPath))
             {
                 throw new SevenZipLibraryException($"can not change the library path because the file \"{libraryPath}\" does not exist.");
             }

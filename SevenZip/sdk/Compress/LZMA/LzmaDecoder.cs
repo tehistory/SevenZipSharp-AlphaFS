@@ -1,10 +1,11 @@
 namespace SevenZip.Sdk.Compression.Lzma
 {
     using System;
-    using System.IO;
 
     using SevenZip.Sdk.Compression.LZ;
     using SevenZip.Sdk.Compression.RangeCoder;
+
+    using Stream = System.IO.Stream;
 
     /// <summary>
     /// The LZMA decoder class

@@ -1,6 +1,6 @@
 namespace SevenZip.Sdk.Buffer
 {
-    using System.IO;
+    using Stream = System.IO.Stream;
 
     /// <summary>
     /// Implements the input buffer work

@@ -2,8 +2,17 @@ namespace SevenZip
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Runtime.InteropServices;
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+    using FileStream = System.IO.FileStream;
+    using FileMode = System.IO.FileMode;
+    using FileAttributes = System.IO.FileAttributes;
+    using SeekOrigin = System.IO.SeekOrigin;
+    using FileNotFoundException = System.IO.FileNotFoundException;
 
 #if UNMANAGED
     /// <summary>
@@ -12,7 +21,7 @@ namespace SevenZip
     internal sealed class ArchiveOpenCallback : CallbackBase, IArchiveOpenCallback, IArchiveOpenVolumeCallback,
                                                 ICryptoGetTextPassword, IDisposable
     {
-        private FileInfo _fileInfo;
+        private AlphaFS.FileInfo _fileInfo;
         private Dictionary<string, InStreamWrapper> _wrappers = 
             new Dictionary<string, InStreamWrapper>();
         private readonly List<string> _volumeFileNames = new List<string>();
@@ -30,7 +39,7 @@ namespace SevenZip
         {
             if (!string.IsNullOrEmpty(fileName))
             {
-                _fileInfo = new FileInfo(fileName);
+                _fileInfo = new AlphaFS.FileInfo(fileName);
                 _volumeFileNames.Add(fileName);
                 if (fileName.EndsWith("001"))
                 {
@@ -38,7 +47,7 @@ namespace SevenZip
                     var baseName = fileName.Substring(0, fileName.Length - 3);
                     var volName = baseName + (index > 99 ? index.ToString() : 
                         index > 9 ? "0" + index : "00" + index);
-                    while (File.Exists(volName))
+                    while (AlphaFS.File.Exists(volName))
                     {
                         _volumeFileNames.Add(volName);
                         index++;
@@ -123,10 +132,10 @@ namespace SevenZip
 
         public int GetStream(string name, out IInStream inStream)
         {
-            if (!File.Exists(name))
+            if (!AlphaFS.File.Exists(name))
             {
-                name = Path.Combine(Path.GetDirectoryName(_fileInfo.FullName), name);
-                if (!File.Exists(name))
+                name = AlphaFS.Path.Combine(AlphaFS.Path.GetDirectoryName(_fileInfo.FullName), name);
+                if (!AlphaFS.File.Exists(name))
                 {
                     inStream = null;
                     AddException(new FileNotFoundException("The volume \"" + name + "\" was not found. Extraction can be impossible."));
@@ -144,7 +153,7 @@ namespace SevenZip
                 try
                 {
                     var wrapper = new InStreamWrapper(
-                        new FileStream(name, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), true);
+                        new FileStream(name, FileMode.Open), true);
                     _wrappers.Add(name, wrapper);
                     inStream = wrapper;                    
                 }

@@ -3,8 +3,18 @@ namespace SevenZip
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Runtime.InteropServices;
+
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+
+    using Stream = System.IO.Stream;
+    using FileStream = System.IO.FileStream;
+    using FileMode = System.IO.FileMode;
+    using SeekOrigin = System.IO.SeekOrigin;
 
 #if UNMANAGED
 
@@ -83,13 +93,13 @@ namespace SevenZip
                 _baseStream = null;                                
             }    
             
-            if (!string.IsNullOrEmpty(_fileName) && File.Exists(_fileName))
+            if (!string.IsNullOrEmpty(_fileName) && AlphaFS.File.Exists(_fileName))
             {
                 try
                 {
-                    File.SetLastWriteTime(_fileName, _fileTime);
-                    File.SetLastAccessTime(_fileName, _fileTime);
-                    File.SetCreationTime(_fileName, _fileTime);
+                    AlphaFS.File.SetLastWriteTime(_fileName, _fileTime);
+                    AlphaFS.File.SetLastAccessTime(_fileName, _fileTime);
+                    AlphaFS.File.SetCreationTime(_fileName, _fileTime);
                 }
                 catch (ArgumentOutOfRangeException) {}
             }
@@ -345,9 +355,9 @@ namespace SevenZip
         {
             string baseName = fileName.Substring(0, fileName.Length - 4);
             int i = 0;
-            while (File.Exists(fileName))
+            while (AlphaFS.File.Exists(fileName))
             {
-                Streams.Add(new FileStream(fileName, FileMode.Open, FileAccess.Read));
+                Streams.Add(new FileStream(fileName, FileMode.Open));
                 long length = Streams[i].Length;
                 StreamOffsets.Add(i++, new KeyValuePair<long, long>(StreamLength, StreamLength + length));
                 StreamLength += length;
@@ -456,7 +466,7 @@ namespace SevenZip
         private void NewVolumeStream()
         {
             CurrentStream++;
-            Streams.Add(File.Create(_archiveName + VolumeNumber(CurrentStream + 1)));
+            Streams.Add(AlphaFS.File.Create(_archiveName + VolumeNumber(CurrentStream + 1)));
             Streams[CurrentStream].SetLength(_volumeSize);
             StreamOffsets.Add(CurrentStream, new KeyValuePair<long, long>(0, _volumeSize - 1));
         }

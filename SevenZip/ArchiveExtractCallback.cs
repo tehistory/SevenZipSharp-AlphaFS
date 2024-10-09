@@ -3,7 +3,14 @@ namespace SevenZip
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+    using Stream = System.IO.Stream;
+    using FileNotFoundException = System.IO.FileNotFoundException;
+    using IOException = System.IO.IOException;
 
 #if UNMANAGED
     /// <summary>
@@ -105,9 +112,9 @@ namespace SevenZip
             _directory = directory;
             _actualIndexes = actualIndexes;
             _directoryStructure = directoryStructure;
-            if (!directory.EndsWith("" + Path.DirectorySeparatorChar, StringComparison.CurrentCulture))
+            if (!directory.EndsWith("" + AlphaFS.Path.DirectorySeparatorChar, StringComparison.CurrentCulture))
             {
-                _directory += Path.DirectorySeparatorChar;
+                _directory += AlphaFS.Path.DirectorySeparatorChar;
             }
         }
 
@@ -232,7 +239,7 @@ namespace SevenZip
                         {
                             if (_filesCount == 1)
                             {
-                                var archName = Path.GetFileName(_extractor.FileName);
+                                var archName = AlphaFS.Path.GetFileName(_extractor.FileName);
                                 archName = archName.Substring(0,
                                                               archName.LastIndexOf('.'));
                                 if (!archName.EndsWith(".tar",
@@ -253,7 +260,7 @@ namespace SevenZip
 
                         try
                         {
-                            fileName = Path.Combine(RemoveIllegalCharacters(_directory, true), RemoveIllegalCharacters(_directoryStructure ? entryName : Path.GetFileName(entryName)));
+                            fileName = AlphaFS.Path.Combine(RemoveIllegalCharacters(_directory, true), RemoveIllegalCharacters(_directoryStructure ? entryName : AlphaFS.Path.GetFileName(entryName)));
                             
                             if (string.IsNullOrEmpty(fileName))
                             {
@@ -275,7 +282,7 @@ namespace SevenZip
                             _archive.GetProperty(index, ItemPropId.LastWriteTime, ref data);
                             var time = NativeMethods.SafeCast(data, DateTime.MinValue);
                             
-                            if (File.Exists(fileName))
+                            if (AlphaFS.File.Exists(fileName))
                             {
                                 var fnea = new FileOverwriteEventArgs(fileName);
 
@@ -318,7 +325,7 @@ namespace SevenZip
 
                             try
                             {
-                                _fileStream = new OutStreamWrapper(File.Create(fileName), fileName, time, true);
+                                _fileStream = new OutStreamWrapper(AlphaFS.File.Create(fileName), fileName, time, true);
                             }
                             catch (Exception e)
                             {
@@ -352,11 +359,11 @@ namespace SevenZip
                                 return 0;
                             }
 
-                            if (!Directory.Exists(fileName))
+                            if (!AlphaFS.Directory.Exists(fileName))
                             {
                                 try
                                 {
-                                    Directory.CreateDirectory(fileName);
+                                    AlphaFS.Directory.CreateDirectory(fileName);
                                 }
                                 catch (Exception e)
                                 {
@@ -497,11 +504,11 @@ namespace SevenZip
         /// <param name="fileName">File name</param>
         private static void CreateDirectory(string fileName)
         {
-            var destinationDirectory = Path.GetDirectoryName(fileName);
+            var destinationDirectory = AlphaFS.Path.GetDirectoryName(fileName);
 
             if (!string.IsNullOrEmpty(destinationDirectory))
             {
-                Directory.CreateDirectory(destinationDirectory);
+                AlphaFS.Directory.CreateDirectory(destinationDirectory);
             }
         }
 
@@ -513,9 +520,9 @@ namespace SevenZip
         /// <returns></returns>
         private static string RemoveIllegalCharacters(string str, bool isDirectory = false)
         {
-            var splitFileName = new List<string>(str.Split(Path.DirectorySeparatorChar));
+            var splitFileName = new List<string>(str.Split(AlphaFS.Path.DirectorySeparatorChar));
 
-            foreach (var chr in Path.GetInvalidFileNameChars())
+            foreach (var chr in AlphaFS.Path.GetInvalidFileNameChars())
             {
                 for (var i = 0; i < splitFileName.Count; i++)
                 {
@@ -534,14 +541,14 @@ namespace SevenZip
                 }
             }
 
-            if (str.StartsWith(new string(Path.DirectorySeparatorChar, 2), StringComparison.CurrentCultureIgnoreCase))
+            if (str.StartsWith(new string(AlphaFS.Path.DirectorySeparatorChar, 2), StringComparison.CurrentCultureIgnoreCase))
             {
                 splitFileName.RemoveAt(0);
                 splitFileName.RemoveAt(0);
-                splitFileName[0] = new string(Path.DirectorySeparatorChar, 2) + splitFileName[0];
+                splitFileName[0] = new string(AlphaFS.Path.DirectorySeparatorChar, 2) + splitFileName[0];
             }
 
-            return string.Join(new string(Path.DirectorySeparatorChar, 1), splitFileName.ToArray());
+            return string.Join(new string(AlphaFS.Path.DirectorySeparatorChar, 1), splitFileName.ToArray());
         }
     }
 #endif

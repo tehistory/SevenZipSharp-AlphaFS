@@ -3,7 +3,7 @@
 namespace SevenZip
 {
     using System;
-    using System.IO;
+    using Stream = System.IO.Stream;
 
     /// <summary>
     /// The arguments passed to <see cref="ExtractFileCallback"/>.

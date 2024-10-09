@@ -1,6 +1,6 @@
 namespace SevenZip.Sdk.Compression.LZ
 {
-    using System.IO;
+    using Stream = System.IO.Stream;
 
     internal class OutWindow
     {

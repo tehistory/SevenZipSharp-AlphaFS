@@ -1,8 +1,9 @@
 ﻿namespace SevenZip
 {
     using System.Collections.Generic;
-    using System.IO;
     using System.Threading.Tasks;
+
+    using Stream = System.IO.Stream;
 
     partial class SevenZipCompressor
     {

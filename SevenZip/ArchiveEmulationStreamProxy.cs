@@ -1,7 +1,8 @@
 ﻿namespace SevenZip
 {
     using System;
-    using System.IO;
+    using Stream = System.IO.Stream;
+    using SeekOrigin = System.IO.SeekOrigin;
 
     /// <summary>
     /// The Stream extension class to emulate the archive part of a stream.
