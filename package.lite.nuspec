@@ -16,13 +16,11 @@
 						Implemented the AlphaFS Filesystem so that long file names can be compressed.
 				</releaseNotes>
         <dependencies>
+						<dependency id="AlphaFS" version="2.2.6"/>
             <group targetFramework="netstandard2.0">
                 <dependency id="System.Configuration.ConfigurationManager" version="4.5.0" />
                 <dependency id="System.Security.Permissions" version="4.5.0" />
             </group>
-						<group targetFramework="net472">
-								<dependency id="AlphaFS" version="2.2.6"/>
-						</group>
             <group targetFramework="netcoreapp3.1">
                 <dependency id="System.Configuration.ConfigurationManager" version="4.5.0" />
             </group>
