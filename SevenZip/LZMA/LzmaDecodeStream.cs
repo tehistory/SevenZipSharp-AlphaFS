@@ -1,9 +1,12 @@
 ﻿namespace SevenZip
 {
     using System;
-    using System.IO;
 
     using SevenZip.Sdk.Compression.Lzma;
+
+    using Stream = System.IO.Stream;
+    using MemoryStream = System.IO.MemoryStream;
+    using SeekOrigin = System.IO.SeekOrigin;
 
     /// <summary>
     /// The stream which decompresses data with LZMA on the fly.

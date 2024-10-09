@@ -3,15 +3,25 @@ namespace SevenZip
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
 #if NET472 || NETSTANDARD2_0
     using System.Security.Permissions;
 #endif
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
 
     using SevenZip.Sdk;
     using SevenZip.Sdk.Compression.Lzma;
+
+    using Stream = System.IO.Stream;
+    using FileStream = System.IO.FileStream;
+    using MemoryStream = System.IO.MemoryStream;
+    using IOException = System.IO.IOException;
+    using FileMode = System.IO.FileMode;
 
     /// <summary>
     /// Class to pack data into archives supported by 7-Zip.
@@ -129,7 +139,7 @@ namespace SevenZip
         {
             try
             {
-                TempFolderPath = Path.GetTempPath();
+                TempFolderPath = AlphaFS.Path.GetTempPath();
             }
             catch (System.Security.SecurityException) // Registry access is not allowed, etc.
             {
@@ -147,11 +157,11 @@ namespace SevenZip
         {
             TempFolderPath = temporaryPath;
 
-            if (!Directory.Exists(TempFolderPath))
+            if (!AlphaFS.Directory.Exists(TempFolderPath))
             {
                 try
                 {
-                    Directory.CreateDirectory(TempFolderPath);
+                    AlphaFS.Directory.CreateDirectory(TempFolderPath);
                 }
                 catch (Exception)
                 {
@@ -338,14 +348,14 @@ namespace SevenZip
 
                     foreach (var pair in CustomParameters)
                     {
-                        #region Validate parameters against compression method.
+#region Validate parameters against compression method.
 
                         if (_compressionMethod != CompressionMethod.Ppmd && (pair.Key.Equals("mem") || pair.Key.Equals("o")))
                         {
                             ThrowException(null, new CompressionFailedException($"Parameter \"{pair.Key}\" is only valid with the PPMd compression method."));
                         }
 
-                        #endregion
+#endregion
 
                         names.Add(Marshal.StringToBSTR(pair.Key));
                         var pv = new PropVariant();
@@ -466,7 +476,7 @@ namespace SevenZip
         {
             var splitFileNames = new List<string[]>(files.Count);
 
-            splitFileNames.AddRange(files.Select(fn => fn.Split(Path.DirectorySeparatorChar)));
+            splitFileNames.AddRange(files.Select(fn => fn.Split(AlphaFS.Path.DirectorySeparatorChar)));
             var minSplitLength = splitFileNames[0].Length - 1;
 
             if (files.Count > 1)
@@ -496,7 +506,7 @@ namespace SevenZip
 
                 if (common)
                 {
-                    res += splitFileNames[0][i] + Path.DirectorySeparatorChar;
+                    res += splitFileNames[0][i] + AlphaFS.Path.DirectorySeparatorChar;
                 }
                 else
                 {
@@ -525,7 +535,7 @@ namespace SevenZip
                 throw new SevenZipInvalidFileNamesException("invalid common root.");
             }
 
-            if (commonRoot.EndsWith(new string(Path.DirectorySeparatorChar, 1), StringComparison.CurrentCulture))
+            if (commonRoot.EndsWith(new string(AlphaFS.Path.DirectorySeparatorChar, 1), StringComparison.CurrentCulture))
             {
                 commonRoot = commonRoot.Substring(0, commonRootLength - 1);
                 commonRootLength--;
@@ -544,7 +554,7 @@ namespace SevenZip
         /// <returns>False if is not empty</returns>
         private static bool RecursiveDirectoryEmptyCheck(string directory)
         {
-            var di = new DirectoryInfo(directory);
+            var di = new AlphaFS.DirectoryInfo(directory);
 
             if (di.GetFiles().Length > 0)
             {
@@ -573,22 +583,22 @@ namespace SevenZip
         /// <param name="directoryCompress">The value indicating whether to produce the array for files in a particular directory or just for an array of files.</param>
         /// <param name="directoryStructure">Preserve directory structure.</param>
         /// <returns>Special FileInfo array for the archive file table.</returns>
-        private static FileInfo[] ProduceFileInfoArray(
+        private static AlphaFS.FileInfo[] ProduceFileInfoArray(
             IReadOnlyList<string> files, int commonRootLength,
             bool directoryCompress, bool directoryStructure)
         {
-            var fis = new List<FileInfo>(files.Count);
+            var fis = new List<AlphaFS.FileInfo>(files.Count);
             var commonRoot = files[0].Substring(0, commonRootLength);
 
             if (directoryCompress)
             {
-                fis.AddRange(files.Select(fn => new FileInfo(fn)));
+                fis.AddRange(files.Select(fn => new AlphaFS.FileInfo(fn)));
             }
             else
             {
                 if (!directoryStructure)
                 {
-                    fis.AddRange(from fn in files where !Directory.Exists(fn) select new FileInfo(fn));
+                    fis.AddRange(from fn in files where !AlphaFS.Directory.Exists(fn) select new AlphaFS.FileInfo(fn));
                 }
                 else
                 {
@@ -601,16 +611,16 @@ namespace SevenZip
 
                         foreach (var f in files)
                         {
-                            var splitAfn = f.Substring(commonRootLength).Split(Path.DirectorySeparatorChar);
+                            var splitAfn = f.Substring(commonRootLength).Split(AlphaFS.Path.DirectorySeparatorChar);
                             var cfn = commonRoot;
 
                             foreach (var t in splitAfn)
                             {
-                                cfn += Path.DirectorySeparatorChar + t;
+                                cfn += AlphaFS.Path.DirectorySeparatorChar + t;
 
                                 if (!fns.Contains(cfn))
                                 {
-                                    fis.Add(new FileInfo(cfn));
+                                    fis.Add(new AlphaFS.FileInfo(cfn));
                                     fns.Add(cfn);
                                 }
                             }
@@ -620,16 +630,16 @@ namespace SevenZip
                     {
                         foreach (var f in files)
                         {
-                            var splitAfn = f.Substring(commonRootLength).Split(Path.DirectorySeparatorChar);
+                            var splitAfn = f.Substring(commonRootLength).Split(AlphaFS.Path.DirectorySeparatorChar);
                             var cfn = splitAfn[0];
 
                             for (var i = 1; i < splitAfn.Length; i++)
                             {
-                                cfn += Path.DirectorySeparatorChar + splitAfn[i];
+                                cfn += AlphaFS.Path.DirectorySeparatorChar + splitAfn[i];
 
                                 if (!fns.Contains(cfn))
                                 {
-                                    fis.Add(new FileInfo(cfn));
+                                    fis.Add(new AlphaFS.FileInfo(cfn));
                                     fns.Add(cfn);
                                 }
                             }
@@ -649,7 +659,7 @@ namespace SevenZip
         /// <param name="searchPattern">Search string, such as "*.txt"</param>
         private void AddFilesFromDirectory(string directory, ICollection<string> files, string searchPattern)
         {
-            var di = new DirectoryInfo(directory);
+            var di = new AlphaFS.DirectoryInfo(directory);
 
             foreach (var fi in di.GetFiles(searchPattern))
             {
@@ -801,7 +811,7 @@ namespace SevenZip
         /// <param name="password">The archive password</param>
         /// <returns></returns>
         private ArchiveUpdateCallback GetArchiveUpdateCallback(
-            FileInfo[] files, int rootLength, string password)
+            AlphaFS.FileInfo[] files, int rootLength, string password)
         {
             SetCompressionProperties();
             var auc = (string.IsNullOrEmpty(password))
@@ -866,12 +876,12 @@ namespace SevenZip
 
         private string GetTempArchiveFileName(string archiveName)
         {
-            return Path.Combine(TempFolderPath, Path.GetFileName(archiveName) + ".~");
+            return AlphaFS.Path.Combine(TempFolderPath, AlphaFS.Path.GetFileName(archiveName) + ".~");
         }
 
         private FileStream GetArchiveFileStream(string archiveName)
         {
-            if ((CompressionMode != CompressionMode.Create || _updateData.FileNamesToModify != null) && !File.Exists(archiveName))
+            if ((CompressionMode != CompressionMode.Create || _updateData.FileNamesToModify != null) && !AlphaFS.File.Exists(archiveName))
             {
                 if (
                     !ThrowException(null,
@@ -883,8 +893,8 @@ namespace SevenZip
 
             return _volumeSize == 0
                 ? CompressionMode == CompressionMode.Create && _updateData.FileNamesToModify == null
-                    ? File.Create(archiveName)
-                    : File.Create(GetTempArchiveFileName(archiveName))
+                    ? AlphaFS.File.Create(archiveName)
+                    : AlphaFS.File.Create(GetTempArchiveFileName(archiveName))
                 : null;
         }
 
@@ -892,7 +902,7 @@ namespace SevenZip
         {
             if (_volumeSize == 0 && (CompressionMode != CompressionMode.Create || _updateData.FileNamesToModify != null))
             {
-                File.Move(GetTempArchiveFileName(_archiveName), _archiveName);
+                AlphaFS.File.Move(GetTempArchiveFileName(_archiveName), _archiveName);
             }
         }
 
@@ -938,11 +948,11 @@ namespace SevenZip
 
         private IInStream GetInStream()
         {
-            return File.Exists(_archiveName) &&
+            return AlphaFS.File.Exists(_archiveName) &&
                    (CompressionMode != CompressionMode.Create && _compressingFilesOnDisk ||
                     _updateData.FileNamesToModify != null)
                 ? new InStreamWrapper(
-                    new FileStream(_archiveName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                    new FileStream(_archiveName, FileMode.Open),
                     true)
                 : null;
         }
@@ -1210,7 +1220,7 @@ namespace SevenZip
                 ValidateStream(archiveStream);
             }
 
-            FileInfo[] files = null;
+            AlphaFS.FileInfo[] files = null;
 
             try
             {
@@ -1283,7 +1293,7 @@ namespace SevenZip
                 else
                 {
                     SevenZipLibraryManager.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
-                    File.Delete(_archiveName);
+                    AlphaFS.File.Delete(_archiveName);
                 }
 
                 _compressingFilesOnDisk = false;
@@ -1336,13 +1346,13 @@ namespace SevenZip
         {
             var files = new List<string>();
 
-            if (!Directory.Exists(directory))
+            if (!AlphaFS.Directory.Exists(directory))
             {
                 throw new ArgumentException("Directory \"" + directory + "\" does not exist!");
             }
 
             // Get full path, in case this is eg. an SFN path.
-            directory = Path.GetFullPath(directory);
+            directory = AlphaFS.Path.GetFullPath(directory);
 
             if (RecursiveDirectoryEmptyCheck(directory))
             {
@@ -1355,7 +1365,7 @@ namespace SevenZip
             }
             else
             {
-                files.AddRange((new DirectoryInfo(directory)).GetFiles(searchPattern).Select(fi => fi.FullName));
+                files.AddRange((new AlphaFS.DirectoryInfo(directory)).GetFiles(searchPattern).Select(fi => fi.FullName));
             }
 
             var commonRootLength = directory.Length;
@@ -1371,7 +1381,7 @@ namespace SevenZip
 
             if (PreserveDirectoryRoot)
             {
-                var upperRoot = Path.GetDirectoryName(directory);
+                var upperRoot = AlphaFS.Path.GetDirectoryName(directory);
 
                 if (upperRoot != null)
                 {
@@ -1433,7 +1443,7 @@ namespace SevenZip
                 }
                 else
                 {
-                    if (!File.Exists(pair.Value))
+                    if (!AlphaFS.File.Exists(pair.Value))
                     {
                         throw new CompressionFailedException(
                             "The file corresponding to the archive entry \"" + pair.Key + "\" does not exist.");
@@ -1441,7 +1451,7 @@ namespace SevenZip
 
                     streamDict.Add(
                         pair.Key,
-                        new FileStream(pair.Value, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+                        new FileStream(pair.Value, FileMode.Open));
                 }
             }
 
@@ -1571,7 +1581,7 @@ namespace SevenZip
                 else
                 {
                     SevenZipLibraryManager.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
-                    File.Delete(_archiveName);
+                    AlphaFS.File.Delete(_archiveName);
                 }
 
                 _compressingFilesOnDisk = false;
@@ -1655,7 +1665,7 @@ namespace SevenZip
                 throw new SevenZipLibraryException("The specified 7zip native library does not support this method.");
             }
 
-            if (!File.Exists(archiveName))
+            if (!AlphaFS.File.Exists(archiveName))
             {
                 if (!ThrowException(null,
                     new ArgumentException("The specified archive does not exist.", nameof(archiveName))))
@@ -1744,7 +1754,7 @@ namespace SevenZip
             finally
             {
                 SevenZipLibraryManager.FreeLibrary(this, Formats.InForOutFormats[_archiveFormat]);
-                File.Delete(archiveName);
+                AlphaFS.File.Delete(archiveName);
                 FinalizeUpdate();
                 _compressingFilesOnDisk = false;
                 _updateData.FileNamesToModify = null;
@@ -1864,7 +1874,7 @@ namespace SevenZip
         /// <returns>Array of file names with full paths.</returns>
         private static string[] GetFullFilePaths(IEnumerable<string> fileFullNames)
         {
-            return fileFullNames.Select(Path.GetFullPath).ToArray();
+            return fileFullNames.Select(AlphaFS.Path.GetFullPath).ToArray();
         }
         
         /// <summary>

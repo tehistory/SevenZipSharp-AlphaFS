@@ -5,10 +5,21 @@ namespace SevenZip
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
 
     using SevenZip.Sdk.Compression.Lzma;
+
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+
+    using Stream = System.IO.Stream;
+    using FileStream = System.IO.FileStream;
+    using MemoryStream = System.IO.MemoryStream;
+    using FileMode = System.IO.FileMode;
+    using SeekOrigin = System.IO.SeekOrigin;
 
     /// <summary>
     /// Class to unpack data from archives supported by 7-Zip.
@@ -300,7 +311,7 @@ namespace SevenZip
                 DisposedCheck();
 
                 return _packedSize ?? (_fileName != null ?
-                           new FileInfo(_fileName).Length :
+                           new AlphaFS.FileInfo(_fileName).Length :
                            -1);
             }
         }
@@ -432,7 +443,7 @@ namespace SevenZip
                 {
                     _archiveStream = new InStreamWrapper(
                         new ArchiveEmulationStreamProxy(new FileStream(
-                            _fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite),
+                            _fileName, FileMode.Open),
                             _offset, _leaveOpen),
                         dispose);
                 }
@@ -1327,7 +1338,7 @@ namespace SevenZip
                         }
                         else
                         {
-                            using (var file = new FileStream(extractFileCallbackArgs.ExtractToFile, FileMode.CreateNew, FileAccess.Write, FileShare.None, 8192))
+                            using (var file = new FileStream(extractFileCallbackArgs.ExtractToFile, FileMode.CreateNew))
                             {
                                 ExtractFile(archiveFileInfo.Index, file);
                             }

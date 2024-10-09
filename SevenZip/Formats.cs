@@ -2,7 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
 
 #if UNMANAGED
     /// <summary>
@@ -601,7 +605,7 @@
             {
                 throw new ArgumentException("File name is null or empty string!");
             }
-            string extension = Path.GetExtension(fileName).Substring(1);
+            string extension = AlphaFS.Path.GetExtension(fileName).Substring(1);
 
             if (!InExtensionFormats.ContainsKey(extension) && reportErrors)
             {

@@ -4,13 +4,23 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Reflection;
     using System.Text;
     using System.Xml;
     using System.Xml.Schema;
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
 
     using SfxSettings = System.Collections.Generic.Dictionary<string, string>;
+
+    using Stream = System.IO.Stream;
+    using FileStream = System.IO.FileStream;
+    using MemoryStream = System.IO.MemoryStream;
+    using FileMode = System.IO.FileMode;
+    using SeekOrigin = System.IO.SeekOrigin;
 
     /// <summary>
     /// Sfx module choice enumeration
@@ -121,14 +131,14 @@
 
             set
             {
-                if (!File.Exists(value))
+                if (!AlphaFS.File.Exists(value))
                 {
                     throw new ArgumentException("The specified file does not exist.");
                 }
 
                 _moduleFileName = value;
                 SfxModule = SfxModule.Custom;
-                var sfxName = Path.GetFileName(value);
+                var sfxName = AlphaFS.Path.GetFileName(value);
 
                 foreach (var mod in SfxSupportedModuleNames.Keys)
                 {
@@ -374,7 +384,7 @@
         /// <param name="sfxFileName">The name of the self-extracting executable.</param>
         public void MakeSfx(Stream archive, string sfxFileName)
         {
-            using (Stream sfxStream = File.Create(sfxFileName))
+            using (Stream sfxStream = AlphaFS.File.Create(sfxFileName))
             {
                 MakeSfx(archive, GetDefaultSettings(), sfxStream);
             }
@@ -398,7 +408,7 @@
         /// <param name="sfxFileName">The name of the self-extracting executable.</param>
         public void MakeSfx(Stream archive, SfxSettings settings, string sfxFileName)
         {
-            using (Stream sfxStream = File.Create(sfxFileName))
+            using (Stream sfxStream = AlphaFS.File.Create(sfxFileName))
             {
                 MakeSfx(archive, settings, sfxStream);
             }
@@ -442,10 +452,10 @@
         /// <param name="sfxFileName">The name of the self-extracting executable.</param>
         public void MakeSfx(string archiveFileName, string sfxFileName)
         {
-            using (Stream sfxStream = File.Create(sfxFileName))
+            using (Stream sfxStream = AlphaFS.File.Create(sfxFileName))
             {
                 using (
-                    Stream archive = new FileStream(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                    Stream archive = new FileStream(archiveFileName, FileMode.Open)
                     )
                 {
                     MakeSfx(archive, GetDefaultSettings(), sfxStream);
@@ -460,7 +470,7 @@
         /// <param name="sfxStream">The stream to write the self-extracting executable to.</param>
         public void MakeSfx(string archiveFileName, Stream sfxStream)
         {
-            using (Stream archive = new FileStream(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+            using (Stream archive = new FileStream(archiveFileName, FileMode.Open)
                 )
             {
                 MakeSfx(archive, GetDefaultSettings(), sfxStream);
@@ -475,10 +485,10 @@
         /// <param name="sfxFileName">The name of the self-extracting executable.</param>
         public void MakeSfx(string archiveFileName, SfxSettings settings, string sfxFileName)
         {
-            using (Stream sfxStream = File.Create(sfxFileName))
+            using (Stream sfxStream = AlphaFS.File.Create(sfxFileName))
             {
                 using (
-                    Stream archive = new FileStream(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                    Stream archive = new FileStream(archiveFileName, FileMode.Open)
                     )
                 {
                     MakeSfx(archive, settings, sfxStream);
@@ -494,7 +504,7 @@
         /// <param name="sfxStream">The stream to write the self-extracting executable to.</param>
         public void MakeSfx(string archiveFileName, SfxSettings settings, Stream sfxStream)
         {
-            using (Stream archive = new FileStream(archiveFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+            using (Stream archive = new FileStream(archiveFileName, FileMode.Open)
                 )
             {
                 MakeSfx(archive, settings, sfxStream);

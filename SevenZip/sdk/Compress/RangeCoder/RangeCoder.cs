@@ -1,7 +1,6 @@
 namespace SevenZip.Sdk.Compression.RangeCoder
 {
-    using System;
-    using System.IO;
+    using Stream = System.IO.Stream;
 
     internal class Encoder
     {

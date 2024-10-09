@@ -1,7 +1,8 @@
 namespace SevenZip
 {
-    using System.IO;
     using System.Threading.Tasks;
+
+    using Stream = System.IO.Stream;
 
     partial class SevenZipExtractor
     {

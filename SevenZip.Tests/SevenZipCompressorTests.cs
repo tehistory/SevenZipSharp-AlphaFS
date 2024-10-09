@@ -2,13 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading;
 
     using SevenZip;
 
     using NUnit.Framework;
+
+#if NETFRAMEWORK
+    using AlphaFS = Alphaleonis.Win32.Filesystem;
+#else
+    using AlphaFS = System.IO;
+#endif
+
+    using FileStream = System.IO.FileStream;
+    using FileMode = System.IO.FileMode;
 
     [TestFixture]
     public class SevenZipCompressorTests : TestBase
@@ -40,7 +48,7 @@
             };
 
             compressor.CompressDirectory("TESTDA~1", TemporaryFile);
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
@@ -67,7 +75,7 @@
             };
 
             compressor.CompressFiles(TemporaryFile, @"TESTDA~1\emptyfile.txt");
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
@@ -86,14 +94,14 @@
             };
             
             compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
                 extractor.ExtractArchive(OutputDirectory);
             }
 
-            Assert.IsTrue(File.Exists(Path.Combine(OutputDirectory, "7z_LZMA2.7z")));
+            Assert.IsTrue(AlphaFS.File.Exists(AlphaFS.Path.Combine(OutputDirectory, "7z_LZMA2.7z")));
         }
 
         [Test]
@@ -106,16 +114,16 @@
             };
 
             compressor.CompressDirectory("TestData", TemporaryFile);
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
                 extractor.ExtractArchive(OutputDirectory);
             }
 
-            File.Delete(TemporaryFile);
+            AlphaFS.File.Delete(TemporaryFile);
 
-            Assert.AreEqual(Directory.GetFiles("TestData").Select(Path.GetFileName).ToArray(), Directory.GetFiles(OutputDirectory).Select(Path.GetFileName).ToArray());
+            Assert.AreEqual(AlphaFS.Directory.GetFiles("TestData").Select(AlphaFS.Path.GetFileName).ToArray(), AlphaFS.Directory.GetFiles(OutputDirectory).Select(AlphaFS.Path.GetFileName).ToArray());
         }
 
         [Test]
@@ -128,7 +136,7 @@
             };
 
             compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
@@ -164,7 +172,7 @@
 
             compressor.ModifyArchive(TemporaryFile, modificationList, "password");
 
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile, "password"))
             {
@@ -181,7 +189,7 @@
                 DirectoryStructure = false
             };
 
-            File.WriteAllText(TemporaryFile, "I'm not an archive.");
+            AlphaFS.File.WriteAllText(TemporaryFile, "I'm not an archive.");
 
             var modificationList = new Dictionary<int, string> {{0, ""}};
 
@@ -198,7 +206,7 @@
             };
 
             compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             compressor.ModifyArchive(TemporaryFile, new Dictionary<int, string> { { 0, "renamed.7z" }});
 
@@ -208,8 +216,8 @@
                 extractor.ExtractArchive(OutputDirectory);
             }
 
-            Assert.IsTrue(File.Exists(Path.Combine(OutputDirectory, "renamed.7z")));
-            Assert.IsFalse(File.Exists(Path.Combine(OutputDirectory, "7z_LZMA2.7z")));
+            Assert.IsTrue(AlphaFS.File.Exists(AlphaFS.Path.Combine(OutputDirectory, "renamed.7z")));
+            Assert.IsFalse(AlphaFS.File.Exists(AlphaFS.Path.Combine(OutputDirectory, "7z_LZMA2.7z")));
         }
 
         [Test]
@@ -222,7 +230,7 @@
             };
 
             compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             compressor.ModifyArchive(TemporaryFile, new Dictionary<int, string> { { 0, null } });
 
@@ -232,7 +240,7 @@
                 extractor.ExtractArchive(OutputDirectory);
             }
 
-            Assert.IsFalse(File.Exists(Path.Combine(OutputDirectory, "7z_LZMA2.7z")));
+            Assert.IsFalse(AlphaFS.File.Exists(AlphaFS.Path.Combine(OutputDirectory, "7z_LZMA2.7z")));
         }
 
         [Test]
@@ -247,8 +255,8 @@
 
             compressor.CompressFiles(TemporaryFile, @"Testdata\7z_LZMA2.7z");
 
-            Assert.AreEqual(3, Directory.GetFiles(OutputDirectory).Length);
-            Assert.IsTrue(File.Exists($"{TemporaryFile}.003"));
+            Assert.AreEqual(3, AlphaFS.Directory.GetFiles(OutputDirectory).Length);
+            Assert.IsTrue(AlphaFS.File.Exists($"{TemporaryFile}.003"));
         }
 
         [Test]
@@ -256,12 +264,12 @@
         {
             var compressor = new SevenZipCompressor {DirectoryStructure = false};
 
-            using (var stream = File.Create(TemporaryFile))
+            using (var stream = AlphaFS.File.Create(TemporaryFile))
             {
                 compressor.CompressFiles(stream, @"TestData\zip.zip");
             }
             
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
@@ -273,9 +281,9 @@
         [Test]
         public void CompressFromStreamTest()
         {
-            using (var input = File.OpenRead(@"TestData\zip.zip"))
+            using (var input = AlphaFS.File.OpenRead(@"TestData\zip.zip"))
             {
-                using (var output = File.Create(TemporaryFile))
+                using (var output = AlphaFS.File.Create(TemporaryFile))
                 {
                     var compressor = new SevenZipCompressor
                     {
@@ -287,12 +295,12 @@
                     
             }
 
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
                 Assert.AreEqual(1, extractor.FilesCount);
-                Assert.AreEqual(new FileInfo(@"TestData\zip.zip").Length, extractor.ArchiveFileData[0].Size);
+                Assert.AreEqual(new AlphaFS.FileInfo(@"TestData\zip.zip").Length, extractor.ArchiveFileData[0].Size);
             }
         }
 
@@ -308,7 +316,7 @@
 
             compressor.CompressFileDictionary(fileDict, TemporaryFile);
 
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
 
             using (var extractor = new SevenZipExtractor(TemporaryFile))
             {
@@ -320,8 +328,8 @@
         [Test]
         public void ThreadedCompressionTest()
         {
-			var tempFile1 = Path.Combine(OutputDirectory, "t1.7z");
-			var tempFile2 = Path.Combine(OutputDirectory, "t2.7z");
+			var tempFile1 = AlphaFS.Path.Combine(OutputDirectory, "t1.7z");
+			var tempFile2 = AlphaFS.Path.Combine(OutputDirectory, "t2.7z");
 
 			var t1 = new Thread(() =>
             {
@@ -340,8 +348,8 @@
             t1.Join();
             t2.Join();
 
-			Assert.IsTrue(File.Exists(tempFile1));
-			Assert.IsTrue(File.Exists(tempFile2));
+			Assert.IsTrue(AlphaFS.File.Exists(tempFile1));
+			Assert.IsTrue(AlphaFS.File.Exists(tempFile2));
 		}
 
         [Test, TestCaseSource(nameof(CompressionMethods))]
@@ -355,7 +363,7 @@
 
             compressor.CompressFiles(TemporaryFile, @"TestData\zip.zip");
 
-            Assert.IsTrue(File.Exists(TemporaryFile));
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
         }
 
         [Test]

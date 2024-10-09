@@ -1,7 +1,7 @@
 namespace SevenZip.Sdk.Compression.LZ
 {
     using System;
-    using System.IO;
+    using Stream = System.IO.Stream;
 
     internal class BinTree : InWindow, IMatchFinder
     {

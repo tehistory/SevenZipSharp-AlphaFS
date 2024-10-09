@@ -3,12 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Runtime.InteropServices;
 #if NET472 || NETSTANDARD2_0
     using System.Security.Permissions;
 #endif
+    using SeekOrigin = System.IO.SeekOrigin;
     using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
+
 
 #if UNMANAGED
 

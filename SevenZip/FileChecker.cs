@@ -1,7 +1,12 @@
 ﻿namespace SevenZip
 {
     using System;
-    using System.IO;
+
+    using Stream = System.IO.Stream;
+    using FileStream = System.IO.FileStream;
+    using FileMode = System.IO.FileMode;
+    using SeekOrigin = System.IO.SeekOrigin;
+    using FileNotFoundException = System.IO.FileNotFoundException;
 
 #if UNMANAGED
     /// <summary>
@@ -235,7 +240,7 @@
         /// <exception cref="System.ArgumentException"/>
         public static InArchiveFormat CheckSignature(string fileName, out int offset, out bool isExecutable)
         {
-            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fs = new FileStream(fileName, FileMode.Open))
             {
                 try
                 {

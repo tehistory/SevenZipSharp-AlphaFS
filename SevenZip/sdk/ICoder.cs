@@ -1,7 +1,7 @@
 namespace SevenZip.Sdk
 {
     using System;
-    using System.IO;
+    using Stream = System.IO.Stream;
 
     /// <summary>
     /// The exception that is thrown when an error in input stream occurs during decoding.
