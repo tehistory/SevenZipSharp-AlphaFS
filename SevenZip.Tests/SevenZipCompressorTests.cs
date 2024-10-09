@@ -406,5 +406,31 @@
                 Assert.AreEqual("zip.zip", extractor.ArchiveFileNames[0]);
             }
         }
+
+        [Test]
+        public void ExceptionallyLongFileNameCompressionTest()
+        {
+            var compressor = new SevenZipCompressor
+            {
+                ArchiveFormat = OutArchiveFormat.Zip,
+                DirectoryStructure = false
+            };
+
+            FileStream fs = AlphaFS.File.Create("DirectoryWithExceptionallyLongNamedData/ThisTextDocumentHasANameThatIsExceptionallyLong123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890.txt");
+            fs.Flush();
+            fs.Dispose();
+
+            compressor.CompressDirectory("DirectoryWithExceptionallyLongNamedData", TemporaryFile);
+            Assert.IsTrue(AlphaFS.File.Exists(TemporaryFile));
+
+            using (var extractor = new SevenZipExtractor(TemporaryFile))
+            {
+                extractor.ExtractArchive(OutputDirectory);
+            }
+
+            AlphaFS.File.Delete(TemporaryFile);
+
+            Assert.AreEqual(AlphaFS.Directory.GetFiles("DirectoryWithExceptionallyLongNamedData").Select(AlphaFS.Path.GetFileName).ToArray(), AlphaFS.Directory.GetFiles(OutputDirectory).Select(AlphaFS.Path.GetFileName).ToArray());
+        }
     }
 }

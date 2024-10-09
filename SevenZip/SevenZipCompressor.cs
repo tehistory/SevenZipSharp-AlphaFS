@@ -8,6 +8,7 @@ namespace SevenZip
 #if NET472 || NETSTANDARD2_0
     using System.Security.Permissions;
 #endif
+    
     using AlphaFS = Alphaleonis.Win32.Filesystem;
 
     using SevenZip.Sdk;
@@ -661,7 +662,7 @@ namespace SevenZip
             {
                 if (!ScanOnlyWritable)
                 {
-                    files.Add(fi.FullName);
+                    files.Add(AlphaFS.Path.GetLongPath(fi.FullName));
                 }
                 else
                 {
@@ -671,7 +672,7 @@ namespace SevenZip
                         {
                         }
 
-                        files.Add(fi.FullName);
+                        files.Add(AlphaFS.Path.GetLongPath(fi.FullName));
                     }
                     catch (IOException)
                     {
@@ -683,7 +684,7 @@ namespace SevenZip
             {
                 if (IncludeEmptyDirectories)
                 {
-                    files.Add(cdi.FullName);
+                    files.Add(AlphaFS.Path.GetLongPath(cdi.FullName));
                 }
 
                 AddFilesFromDirectory(cdi.FullName, files, searchPattern);
@@ -1314,9 +1315,9 @@ namespace SevenZip
         public void CompressDirectory(string directory, string archiveName, string password = "", string searchPattern = "*", bool recursion = true)
         {
             _compressingFilesOnDisk = true;
-            _archiveName = archiveName;
+            _archiveName = AlphaFS.Path.GetLongPath(archiveName);
 
-            using (var fs = GetArchiveFileStream(archiveName))
+            using (var fs = GetArchiveFileStream(AlphaFS.Path.GetLongPath(archiveName)))
             {
                 if (fs == null && _volumeSize == 0)
                 {
@@ -1361,7 +1362,7 @@ namespace SevenZip
             }
             else
             {
-                files.AddRange((new AlphaFS.DirectoryInfo(directory)).GetFiles(searchPattern).Select(fi => fi.FullName));
+                files.AddRange((new AlphaFS.DirectoryInfo(directory)).GetFiles(searchPattern).Select(fi => AlphaFS.Path.GetLongPath(fi.FullName)));
             }
 
             var commonRootLength = directory.Length;
