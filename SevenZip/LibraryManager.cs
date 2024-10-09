@@ -10,11 +10,7 @@ namespace SevenZip
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Text;
-#if NETFRAMEWORK
     using AlphaFS = Alphaleonis.Win32.Filesystem;
-#else
-    using AlphaFS = System.IO;
-#endif
     using Stream = System.IO.Stream;
     using MemoryStream = System.IO.MemoryStream;
 

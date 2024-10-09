@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-        <id>Squid-Box.SevenZipSharp.Lite</id>
-        <version>1.0.0</version>
-        <authors>Joel Ahlgren</authors>
-        <summary>Managed 7-zip library written in C# that provides data extraction and compression (all 7-zip formats are supported).</summary>
+        <id>tehistory.SevenZipSharpWithAlphaFS.Lite</id>
+        <version>2.0.1</version>
+        <authors>Frank Egelhoff</authors>
+        <summary>Managed 7-zip library written in C# that provides data extraction and compression (all 7-zip formats are supported). Utilizing AlphaFS Filesystem to handle long file names.</summary>
         <description>Wraps 7z.dll or any compatible one and makes use of LZMA SDK. Excludes creation of self-extracting executables, reducing file size.</description>
         <readme>docs\readme.md</readme>
         <language>en-US</language>
         <license type="expression">LGPL-3.0-only</license>
-        <projectUrl>https://github.com/squid-box/SevenZipSharp</projectUrl>
-        <tags>7z sevenzip sevenzipsharp 7-zip</tags>
+        <projectUrl>https://github.com/tehistory/SevenZipSharp-AlphaFS</projectUrl>
+        <tags>7z sevenzip sevenzipsharp 7-zip AlphaFS</tags>
         <releaseNotes>
-            Ensuring streams provided are at the beginning of the file, thanks to GitHub user fgimian.
-            Fixed an issues where SFX archives would not be correctly detected, thanks to GitHub user fgimian.
-            Added support for APFS format, thanks to GitHub user elihwyma.
-            Added support for Wim format, thanks to GitHub user pysj.
-        </releaseNotes>
+						Forked from:https://github.com/squid-box/SevenZipSharp
+						Implemented the AlphaFS Filesystem so that long file names can be compressed.
+				</releaseNotes>
         <dependencies>
+						<dependency id="AlphaFS" version="2.2.6"/>
             <group targetFramework="netstandard2.0">
                 <dependency id="System.Configuration.ConfigurationManager" version="4.5.0" />
                 <dependency id="System.Security.Permissions" version="4.5.0" />
             </group>
-            <group targetFramework="net472" />
             <group targetFramework="netcoreapp3.1">
                 <dependency id="System.Configuration.ConfigurationManager" version="4.5.0" />
             </group>

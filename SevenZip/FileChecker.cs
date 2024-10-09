@@ -6,7 +6,6 @@
     using FileStream = System.IO.FileStream;
     using FileMode = System.IO.FileMode;
     using SeekOrigin = System.IO.SeekOrigin;
-    using FileNotFoundException = System.IO.FileNotFoundException;
 
 #if UNMANAGED
     /// <summary>

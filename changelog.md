@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.0.1 (2024-09-10)
+- Changed AlphaFS to be force regardless of framework.
+
+## 2.0.0 (2024-08-10)
+- Forked from:https://github.com/squid-box/SevenZipSharp
+- Implemented the AlphaFS Filesystem so that long file names can be compressed.
+
 ## 1.6.2 (2024-04-10)
 - Ensuring streams provided are at the beginning of the file, thanks to GitHub user fgimian.
 - Fixed an issues where SFX archives would not be correctly detected, thanks to GitHub user fgimian.
